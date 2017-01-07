@@ -5,6 +5,13 @@
      * [Unit level](#technical-tests-unit-level-explanation)
      * [Integration level](#technical-tests-integration-level-explanation)
    * [Functional tests](#functional-tests-explanation)
+ * [Rules](#rules)
+   * [Early stop](#rules-early-stop)
+   * [Strict mode](#rules-strict-mode)
+   * [Risky tests](#rules-risky-tests)
+   * [Tests isolation](#rules-tests-isolation)
+   * [Real coverage](#rules-real-coverage)
+   * [Test documentation](#rules-test-documentation)
  * [Tests root directory](#tests-root-directory)
  * [Base namespace](#base-namespace)
  * [Tests order](#tests-order)
@@ -55,6 +62,65 @@ Test could use a slice of repository source code (to ensure a functionality for 
  * With **Behat**
 
 Tests will use the complete repository source code and will perform tests to cover production end-user actions
+
+## Rules 
+<a name="rules-early-stop"></a>
+### Early stop
+**Tests execution must be stop at first failure or error**
+
+Stopping execution is useful for CI, as it will produce builds with a smaller execution time
+
+It's not really useful for the developer, but it's better to always keep the same behavior than CI, even for developer
+
+<a name="rules-strict-mode"></a>
+### Strict mode
+Following test must be converted into failed test : 
+<a name="rules-strict-mode-php-errors"></a>
+ * A **test that have php notices/warnings/errors**
+<a name="rules-strict-mode-risky-tests"></a>
+ * A **[Risky test](#rules-risky-tests)**
+
+<a name="rules-risky-tests"></a>
+### Risky tests
+Following behavior must turn test into Risky test
+<a name="rules-risky-tests-output"></a>
+ * A **test that have an output**
+   * Usually it's the result of forgotten debug statements
+<a name="rules-risky-tests-manipulate-globals"></a>
+ * A **test that manipulates globals**
+   * Using globals create unexpected behavior
+   * Except for 0.01% of tests, we now have enought php library to avoid using globals
+<a name="rules-risky-tests-test-nothing"></a>
+ * A **test that do not test anything**
+   * Do not allow unnecessary testing to pollute the test class
+   * Test should probably be completed
+
+<a name="rules-tests-isolation"></a>
+### Tests isolation
+A test must not impact another (and so a test must not expect that another has been executed)
+<a name="rules-tests-isolation-globals"></a>
+ * **Globals must be backuped and restored between each test**
+<a name="rules-tests-isolation-static"></a>
+ * **Static class member must be backuped and restored between each test**
+<a name="rules-tests-isolation-different-process"></a>
+ * *Test should be launched in different process*
+
+<a name="rules-real-coverage"></a>
+### Real coverage
+<a name="rules-real-coverage-overflow"></a>
+ * **No coverage overflow**
+   
+   A test for a class `A` must not impact coverage or C.R.A.P. score of an another class (including class `A` dependencies)
+
+<a name="rules-real-coverage-risky-tests"></a>
+ * **[Risky test](#rules-risky-tests) must not count in coverage or C.R.A.P. score**
+ 
+<a name="rules-test-documentation"></a>
+### Test documentation
+<a name="rules-test-documentation-tested-class-description"></a>
+ * *A test class should describe which class it tests*
+<a name="rules-test-documentation-tested-class-dependencies-description"></a>
+ * *A test class should describe what are the tested class dependencies used during tests*
 
 ## Tests root directory
 **Behat** folder : `features/`
