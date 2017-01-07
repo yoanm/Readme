@@ -1,9 +1,6 @@
-## Tests
+# Tests
 
-**Behat** *test folder : `features`*
-
-**Phpunit** *test folder : `tests`*
-
+## Explanation
 ### Technical tests
 **Contributor/code point of view**
 
@@ -13,21 +10,11 @@ Test scope is a public php `class` method
 
  * **Unit level** (PhpUnit)
 
-*Directory : `tests/Technical/Unit/`*
-
-*Base namespace : `Technical\Unit\VendorNamespace\ProjectNamespace`*
-
 **Any `object` used in the tested class (aka dependency, could be contructor argument or an instanciation inside the class) must be mocked** using **Prophecy**, if "not possible", the test must be moved under Integration level. 
 
 *Most of tests should be done at Unit level as it's the faster one (execution time point of view), so issues are found earlier.*
 
  * **Integration level** (PhpUnit)
-
-*Directory : `tests/Technical/Integration/`*
-
-*Base namespace : `Technical\Integration\VendorNamespace\ProjectNamespace`*
-
-*Launched after Unit level tests*
 
 Dependencies *could* be mocked but it's not mandatory.
 
@@ -48,27 +35,57 @@ Test scope is the "public API" of this repository (testing api payloads or websi
 
  * With **Phpunit**
 
-*Directory : `features/bootstrap/`*
-
-*Base namespace : `Functional\VendorNamespace\ProjectNamespace`*
-
-*Launched after Technical Integration tests*
-
 Test could use a slice of repository source code (to ensure a functionality for instance but without taking in account a "upper level" of code)
 
  * With **Behat**
 
-*Behat context directory : `features/bootstrap/`*
-
-*Behat context base namespace : `Functional\VendorNamespace\ProjectNamespace\BehatContext`*
-
-*Behat features directory : `features/`*
-
-*Launched after Phpunit Functional tests*
-
 Tests will use the complete repository source code and will perform tests to cover production end-user actions
 
-### Example
+## Tests root directory
+**Behat** folder : `features/`
+
+**Phpunit** folder : `tests/`
+
+### Technical tests
+ * **Unit level** : `tests/Technical/Unit/`
+ * **Integration level** : `tests/Technical/Integration/`
+
+### Functional tests
+ * With **Phpunit** : `features/bootstrap/`
+ * With **Behat**
+   * **Context** root directory : `features/bootstrap/`
+   * **Features** root directory : `features/` 
+     
+     or `features/SOMETHING/` (`SOMETHING` could be `methods` for an API project for instance)
+   
+## Base namespace
+### Technical tests
+ * **Unit level** : `Technical\Unit\VendorNamespace\ProjectNamespace`
+ * **Integration level** : `Technical\Integration\VendorNamespace\ProjectNamespace`
+
+### Functional tests
+ * With **Phpunit** : `Functional\VendorNamespace\ProjectNamespace`
+ * With **Behat**
+
+   **Context** base namespace : `Functional\VendorNamespace\ProjectNamespace\BehatContext`
+   
+## Tests order
+ * To have the smaller execution time, run test from faster to slower.
+ * Order to run tests : 
+   * Technical 
+      
+     1 - **Unit level** 
+
+     2 -  **Integration level** : Slower than previous ones
+   * Functional : 
+   
+     No need to run functional test if technical ones have failed
+      
+     3 - With **Phpunit**
+
+     4 - With **Behat** : Slower than previous ones
+
+## Example
 Let's say we have a class called `ExampleHelper` with the following namespace `VendorNamespace\ProjectNamespace\Helper\ExampleHelper`
 
 A test for ExampleHelper class must have one of the following path and namespace:
@@ -91,3 +108,6 @@ A test for ExampleHelper class must have one of the following path and namespace
 A Behat context must have the following namespace and path:
  * Path `features/bootstrap/MyContext.php`
  * Namespace `Functional\VendorNamespace\ProjectNamespace\BehatContext`
+ 
+## PhpUnit configuration
+See [there](./Tests/Phpunit_configuration.md)
