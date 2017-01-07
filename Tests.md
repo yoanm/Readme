@@ -1,6 +1,18 @@
 # Tests
 
+ * [Explanation](#explanation)
+   * [Technical tests](#technical-tests-explanation)
+     * [Unit level](#technical-tests-unit-level-explanation)
+     * [Integration level](#technical-tests-integration-level-explanation)
+   * [Functional tests](#functional-tests-explanation)
+ * [Tests root directory](#tests-root-directory)
+ * [Base namespace](#base-namespace)
+ * [Tests order](#tests-order)
+ * [Example](#example)
+   * [PhpUnit configuration](#phpunit-configuration)
+
 ## Explanation
+<a name="technical-tests-explanation"></a>
 ### Technical tests
 **Contributor/code point of view**
 
@@ -8,12 +20,14 @@
 
 Test scope is a public php `class` method
 
+<a name="technical-tests-unit-level-explanation"></a>
  * **Unit level** (PhpUnit)
 
 **Any `object` used in the tested class (aka dependency, could be contructor argument or an instanciation inside the class) must be mocked** using **Prophecy**, if "not possible", the test must be moved under Integration level. 
 
 *Most of tests should be done at Unit level as it's the faster one (execution time point of view), so issues are found earlier.*
 
+<a name="technical-tests-integration-level-explanation"></a>
  * **Integration level** (PhpUnit)
 
 Dependencies *could* be mocked but it's not mandatory.
@@ -26,6 +40,7 @@ Put here all tests that test :
  * ...
  * a method that have dependencies not mocked for any other reasons
 
+<a name="functional-tests-explanation"></a>
 ### Functional tests
 **End-user point of view**
 
@@ -109,5 +124,5 @@ A Behat context must have the following namespace and path:
  * Path `features/bootstrap/MyContext.php`
  * Namespace `Functional\VendorNamespace\ProjectNamespace\BehatContext`
  
-## PhpUnit configuration
+### PhpUnit configuration
 See [there](./Tests/Phpunit_configuration.md)
