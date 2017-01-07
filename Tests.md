@@ -51,12 +51,12 @@ Tests will use the complete repository source code and will perform tests to cov
  * **Integration level** : `tests/Technical/Integration/`
 
 ### Functional tests
- * With **Phpunit** : `features/bootstrap/`
+ * With **Phpunit** : `tests/Functional/`
  * With **Behat**
-   * **Context** root directory : `features/bootstrap/`
-   * **Features** root directory : `features/` 
-     
-     or `features/SOMETHING/` (`SOMETHING` could be `methods` for an API project for instance)
+   
+  * **Context** root directory : `features/bootstrap/` 
+   
+  * **Features** root directory : `features/SOMETHING/` (`SOMETHING` could be `methods` for an API project for instance)
    
 ## Base namespace
 ### Technical tests
@@ -70,7 +70,7 @@ Tests will use the complete repository source code and will perform tests to cov
    **Context** base namespace : `Functional\VendorNamespace\ProjectNamespace\BehatContext`
    
 ## Tests order
- * To have the smaller execution time, run test from faster to slower.
+ * To have the smaller execution time, run tests from faster to slower.
  * Order to run tests : 
    * Technical 
       
