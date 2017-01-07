@@ -72,14 +72,14 @@ Tests will use the complete repository source code and will perform tests to cov
 ## Tests order
  * To have the smaller execution time, run tests from faster to slower.
  * Order to run tests : 
-   * Technical 
+   * Technical tests
       
      1 - **Unit level** 
 
      2 -  **Integration level** : Slower than previous ones
-   * Functional : 
+   * Functional tests
    
-     No need to run functional test if technical ones have failed
+     No need to run functional tests if technical ones have failed
       
      3 - With **Phpunit**
 
