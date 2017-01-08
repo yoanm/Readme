@@ -81,9 +81,9 @@ It's not really useful for the developer, but it's better to always keep the sam
 <a name="rules-strict-mode-fails-if"></a>
 #### Fails if
 Following test must be converted into failed test : 
-<a name="rules-strict-mode-fail-id-php-errors"></a>
+<a name="rules-strict-mode-fail-if-php-errors"></a>
  * A **test that have php notices/warnings/errors**
-<a name="rules-strict-mode-fail-id-risky-tests"></a>
+<a name="rules-strict-mode-fail-if-risky-tests"></a>
  * A **[Risky test](#rules-risky-tests)**
 
 <a name="rules-risky-tests"></a>
