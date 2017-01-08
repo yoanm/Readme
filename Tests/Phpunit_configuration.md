@@ -63,21 +63,21 @@
 
   * [Risky test](../Tests.md#rules-risky-tests)
 
-    * `beStrictAboutOutputDuringTests="true"` [Risky test - output](../Tests.md#rules-risky-tests-output)
-    * `beStrictAboutChangesToGlobalState="true"` [Risky test - globals](../Tests.md#rules-risky-tests-manipulate-globals)
-    * `beStrictAboutTestsThatDoNotTestAnything="true"` [Risky test - test nothing](../Tests.md#rules-risky-tests-test-nothing)
+    * [No Output](../Tests.md#rules-risky-tests-output) with `beStrictAboutOutputDuringTests="true"` 
+    * [No globals manipulation](../Tests.md#rules-risky-tests-manipulate-globals) with `beStrictAboutChangesToGlobalState="true"`
+    * [No test that test nothing](../Tests.md#rules-risky-tests-test-nothing) with `beStrictAboutTestsThatDoNotTestAnything="true"`
   
   * [Test isolation](../Tests.md#rules-tests-isolation)
     
-    * `backupGlobals="true"` [test isolation - global](../Tests.md#rules-tests-isolation-globals)
+    * [Globals backup](../Tests.md#rules-tests-isolation-globals) with `backupGlobals="true"`
       
       *Required by `beStrictAboutChangesToGlobalState="true"`*
 
-    * `backupStaticAttributes="false"` : [test isolation - static](../Tests.md#rules-tests-isolation-static-class-member)
+    * [Static class member backup](../Tests.md#rules-tests-isolation-static-class-member) with `backupStaticAttributes="false"`
   
   * [Real coverage](../Tests.md#rules-real-coverage)
     
-    * [Coverage overflow](../Tests.md#rules-real-coverage-overflow)
+    * [No coverage overflow](../Tests.md#rules-real-coverage-overflow)
       
       * `forceCoversAnnotation="true"`
 
@@ -91,11 +91,11 @@
          */
         ```
 
-    * [Risky tests](../Tests.md#rules-real-coverage-risky-tests)
+    * [Risky tests does not count in coverage](../Tests.md#rules-real-coverage-risky-tests)
     
-      * `beStrictAboutOutputDuringTests="true"` (requires [`listener`](#listener))
-      * `beStrictAboutChangesToGlobalState="true"`
-      * `beStrictAboutTestsThatDoNotTestAnything="true"`
+      * [No Output](../Tests.md#rules-risky-tests-output) with `beStrictAboutOutputDuringTests="true"` (requires [`listener`](#listener))
+      * [No globals manipulation](../Tests.md#rules-risky-tests-manipulate-globals) with `beStrictAboutChangesToGlobalState="true"`
+      * [No test that test nothing](../Tests.md#rules-risky-tests-test-nothing) with `beStrictAboutTestsThatDoNotTestAnything="true"`
     
   * <a name="listener"></a>\<listener>
       
@@ -105,13 +105,13 @@
 
         * Required by 
       
-          * `beStrictAboutOutputDuringTests="true"`
-          * `beStrictAboutChangesToGlobalState="true"`
-          * `beStrictAboutTestsThatDoNotTestAnything="true"`
+          * `beStrictAboutOutputDuringTests="true"` ([No Output](../Tests.md#rules-risky-tests-output))
+          * `beStrictAboutChangesToGlobalState="true"` ([No globals manipulation](../Tests.md#rules-risky-tests-manipulate-globals))
+          * `beStrictAboutTestsThatDoNotTestAnything="true"` ([No test that test nothing](../Tests.md#rules-risky-tests-test-nothing))
 
-      * [Real coverage - risky tests](../Tests.md#rules-real-coverage-risky-tests) for some specific kinds of risky test   
+      * [Real coverage - risky tests  does not count in coverage](../Tests.md#rules-real-coverage-risky-tests) for some specific kinds of risky test   
       
-          * Required by `beStrictAboutOutputDuringTests="true"`
+          * Required by `beStrictAboutOutputDuringTests="true"` ([No Output](../Tests.md#rules-risky-tests-output))
 
 #### Optional
   * [Test doc - tested class](../Tests.md#rules-test-documentation-tested-class-description) : by using `@covers`
