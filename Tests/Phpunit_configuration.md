@@ -1,4 +1,7 @@
 # PhpUnit configuration
+
+*PhpUnit implementation of this* **[Tests strategy](../Tests.md)**
+
 ## Configuration reference
 ```xml
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -22,7 +25,17 @@
         <listener class="StrictModeListener" file="tests/StrictModeListener.php"/>
   </listeners>
 
-  ...
+  <testsuites>
+      <testsuite name="technical">
+          <directory>tests/Technical/Unit/*</directory>
+          <!-- define (and so, launch) integration tests after unit tests => slower than unit tests -->
+          <directory>tests/Technical/Integration/*</directory>
+      </testsuite>
+      <!-- defined (and so, launch) functional tests tests after technical tests => slower than technical tests -->
+      <testsuite name="functional">
+          <directory>tests/Functional/*</directory>
+      </testsuite>
+  </testsuites>
 
   <filter>
     <whitelist>
@@ -99,19 +112,23 @@
     
   * <a name="listener"></a>\<listener>
       
-      Listener will validate following mandatory rules
+    Listener will validate following mandatory rules
 
-      * [Strict mode - fails if - risky tests](../Tests.md#rules-strict-mode-fails-if-risky-tests)
+    * [Strict mode - fails if - risky tests](../Tests.md#rules-strict-mode-fails-if-risky-tests)
 
-        * Required by 
+      * Required by 
       
-          * `beStrictAboutOutputDuringTests="true"` ([No Output](../Tests.md#rules-risky-tests-output))
-          * `beStrictAboutChangesToGlobalState="true"` ([No globals manipulation](../Tests.md#rules-risky-tests-manipulate-globals))
-          * `beStrictAboutTestsThatDoNotTestAnything="true"` ([No test that test nothing](../Tests.md#rules-risky-tests-test-nothing))
+        * `beStrictAboutOutputDuringTests="true"` ([No Output](../Tests.md#rules-risky-tests-output))
+        * `beStrictAboutChangesToGlobalState="true"` ([No globals manipulation](../Tests.md#rules-risky-tests-manipulate-globals))
+        * `beStrictAboutTestsThatDoNotTestAnything="true"` ([No test that test nothing](../Tests.md#rules-risky-tests-test-nothing))
 
-      * [Real coverage - risky tests  does not count in coverage](../Tests.md#rules-real-coverage-risky-tests) for some specific kinds of risky test   
+    * [Real coverage - risky tests  does not count in coverage](../Tests.md#rules-real-coverage-risky-tests) for some specific kinds of risky test   
       
           * Required by `beStrictAboutOutputDuringTests="true"` ([No Output](../Tests.md#rules-risky-tests-output))
+  * <a name="test-suites"></a>\<test-suites>
+    
+    * [Tests Root directory](../Tests.md#tests-root-directory)
+    * [Tests order](../Tests.md#tests-order)
 
 #### Optional
   * [Test doc - tested class](../Tests.md#rules-test-documentation-tested-class-description) : by using `@covers`
