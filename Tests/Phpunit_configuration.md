@@ -46,7 +46,8 @@
 
 ## Explanations
 
-### Mandatory rules
+### Rules validated with [configuration reference](#configuration-reference)
+#### Mandatory
 
   * [Early stop](../Tests.md#rules-early-stop)
 
@@ -55,17 +56,19 @@
 
   * [Strict mode](../Tests.md#rules-strict-mode)
 
-    * [Strict mode - php errors](../Tests.md#rules-strict-mode-php-errors)
+    * [Exit status](#rules-strict-mode-exit-code) : PhpUnit command will return a failed status if a failed or on error test exist
+    * [Fails if](../Tests.md#rules-strict-mode-fails-if)
+      * [Php errors](../Tests.md#rules-strict-mode-fails-if-php-errors)
 
-      * `convertErrorsToExceptions="true"`
-      * `convertNoticesToExceptions="true"`
-      * `convertWarningsToExceptions="true"`
+        * `convertErrorsToExceptions="true"`
+        * `convertNoticesToExceptions="true"`
+        * `convertWarningsToExceptions="true"`
     
-    * [Strict mode - risky tests](../Tests.md#rules-strict-mode-risky-tests) (requires [`listener`](#listener))
+      * [Risky tests](../Tests.md#rules-strict-mode-fails-if-risky-tests) (requires [`listener`](#listener))
 
-      * `beStrictAboutOutputDuringTests="true"`
-      * `beStrictAboutChangesToGlobalState="true"`
-      * `beStrictAboutTestsThatDoNotTestAnything="true"`
+        * `beStrictAboutOutputDuringTests="true"`
+        * `beStrictAboutChangesToGlobalState="true"`
+        * `beStrictAboutTestsThatDoNotTestAnything="true"`
 
   * [Risky test](../Tests.md#rules-risky-tests)
 
@@ -96,18 +99,33 @@
         If no annotation, no coverage.
 
         Symply add the following as test class or test method comment
-```
-/**
- * @covers FULLY\QUALIFIED\NAMESPACE\TO\MyClass
- */
-```
 
-<a name="listener"></a>
- 
-### Optional rules (validated with [configuration reference](#configuration-reference))
+        ```
+        /**
+         * @covers FULLY\QUALIFIED\NAMESPACE\TO\MyClass
+         */
+        ```
+
+    * <a name="listener"></a>Listener
+      
+      Listener will validate following mandatory rules
+
+      * [Strict mode - risky tests](../Tests.md#rules-strict-mode-risky-tests) 
+
+        * Required by 
+      
+          * `beStrictAboutOutputDuringTests="true"`
+          * `beStrictAboutChangesToGlobalState="true"`
+          * `beStrictAboutTestsThatDoNotTestAnything="true"`
+
+      * [Real coverage - risky tests](../Tests.md#rules-real-coverage-risky-tests) for some specific kinds of risky test   
+      
+          * Required by `beStrictAboutOutputDuringTests="true"`
+
+#### Optional
   * [Test doc - tested class](../Tests.md##rules-test-documentation-tested-class-description) : by using `@covers`
       
-    *In fact, required as configuration uses `forceCoversAnnotation="true"`*
+    *In fact, required if coverage is used as configuration uses `forceCoversAnnotation="true"`*
 
   * [Test doc - tested class dependencies](../Tests.md#rules-test-documentation-tested-class-dependencies-description) by using `@uses`
   
@@ -121,7 +139,7 @@
  */
 class MyClassTest extends \PHPUnit_Framework_TestCase
 ```
-
+ 
 ### Optional config
   
   * `bootstrap="vendor/autoload.php"` : Autoload file
