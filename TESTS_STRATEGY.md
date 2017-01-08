@@ -205,7 +205,7 @@ A Behat context must have the following namespace and path:
  
 <a name="example-phpunit-configuration-example"></a>
 ### PhpUnit configuration example
-See [there](./Tests/Phpunit_configuration.md)
+See [there](./TestStrategy/PHPUNIT_IMPLEMENTATION.md)
 
 <a name="example-composer-configuration-example"></a>
 ### Composer configuration example
