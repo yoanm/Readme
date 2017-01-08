@@ -48,7 +48,7 @@
 
   * `beStrictAboutChangesToGlobalState="true"`requires `backupGlobals="true"` in order to work
 
-## Rules validated with [configuration reference](#configuration-reference)
+## [Rules](../TESTS_STRATEGY.md#rules) validated with [configuration reference](#configuration-reference)
 
 ### Mandatory
 
@@ -141,7 +141,7 @@ Listener will validate following mandatory rules
 
  * [Test doc - tested class dependencies](../TESTS_STRATEGY.md#rules-test-documentation-tested-class-dependencies-description) by using `@uses`
   
-    Also use `checkForUnintentionallyCoveredCode="true"`, to be sure sure that new dependencies will be forced to be documented. With [configuration reference](#configuration-reference), it will convert test into risky test, and risky test will be converted into failed test by [`listener`](#listener)
+    * Also use `checkForUnintentionallyCoveredCode="true"`, to be sure sure that new dependencies will be forced to be documented. With [configuration reference](#configuration-reference), it will convert test into risky test, and risky test will be converted into failed test by [`listener`](#listener)
       
     Simply add the following as test class or test method comment : 
     ```
