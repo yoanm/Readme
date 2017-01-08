@@ -12,11 +12,12 @@
    * [Tests isolation](#rules-tests-isolation)
    * [Real coverage](#rules-real-coverage)
    * [Test documentation](#rules-test-documentation)
- * [Tests root directory](#tests-root-directory)
- * [Base namespace](#base-namespace)
- * [Tests order](#tests-order)
+   * [Tests Root directory](#tests-root-directory)
+   * [Tests order](#tests-order)
+   * [Base namespace](#base-namespace)
  * [Example](#example)
-   * [PhpUnit configuration](#phpunit-configuration)
+   * [PhpUnit configuration example](#phpunit-configuration-example)
+   * [Composer configuration example](#composer-configuration-example)
 
 ## Explanation
 <a name="technical-tests-explanation"></a>
@@ -64,6 +65,7 @@ Test could use a slice of repository source code (to ensure a functionality for 
 Tests will use the complete repository source code and will perform tests to cover production end-user actions
 
 ## Rules 
+*See [Phpunit config example](example-phpunit-configuration-example) and [Composer config example]()
 <a name="rules-early-stop"></a>
 ### Early stop
 **Tests execution must be stop at first failure or error**
@@ -128,16 +130,16 @@ A test must not impact another (and so a test must not expect that another has b
 <a name="rules-test-documentation-tested-class-dependencies-description"></a>
  * *A test class should describe what are the tested class dependencies used during tests*
 
-## Tests root directory
+### Tests root directory
 **Behat** folder : `features/`
 
 **Phpunit** folder : `tests/`
 
-### Technical tests
+#### Technical tests
  * **Unit level** : `tests/Technical/Unit/`
  * **Integration level** : `tests/Technical/Integration/`
 
-### Functional tests
+#### Functional tests
  * With **Phpunit** : `tests/Functional/`
  * With **Behat**
    
@@ -145,18 +147,7 @@ A test must not impact another (and so a test must not expect that another has b
    
   * **Features** root directory : `features/SOMETHING/` (`SOMETHING` could be `methods` for an API project for instance)
    
-## Base namespace
-### Technical tests
- * **Unit level** : `Technical\Unit\VendorNamespace\ProjectNamespace`
- * **Integration level** : `Technical\Integration\VendorNamespace\ProjectNamespace`
-
-### Functional tests
- * With **Phpunit** : `Functional\VendorNamespace\ProjectNamespace`
- * With **Behat**
-
-   **Context** base namespace : `Functional\VendorNamespace\ProjectNamespace\BehatContext`
-   
-## Tests order
+### Tests order
  * To have the smaller execution time, run tests from faster to slower.
  * Order to run tests : 
    * Technical tests
@@ -172,6 +163,17 @@ A test must not impact another (and so a test must not expect that another has b
 
      4 - With **Behat** : Slower than previous ones
 
+### Base namespace
+#### Technical tests
+ * **Unit level** : `Technical\Unit\VendorNamespace\ProjectNamespace`
+ * **Integration level** : `Technical\Integration\VendorNamespace\ProjectNamespace`
+
+#### Functional tests
+ * With **Phpunit** : `Functional\VendorNamespace\ProjectNamespace`
+ * With **Behat**
+
+   **Context** base namespace : `Functional\VendorNamespace\ProjectNamespace\BehatContext`
+   
 ## Example
 Let's say we have a class called `ExampleHelper` with the following namespace `VendorNamespace\ProjectNamespace\Helper\ExampleHelper`
 
@@ -196,5 +198,19 @@ A Behat context must have the following namespace and path:
  * Path `features/bootstrap/MyContext.php`
  * Namespace `Functional\VendorNamespace\ProjectNamespace\BehatContext`
  
-### PhpUnit configuration
+<a name="example-phpunit-configuration-example"></a>
+### PhpUnit configuration example
 See [there](./Tests/Phpunit_configuration.md)
+
+<a name="example-composer-configuration-example"></a>
+### Composer configuration example
+```json
+  "autoload-dev": {
+    "psr-4": {
+      "Technical\\Unit\\VendorNamespace\\ProjectNamespace\\": "tests/Technical/Unit",
+      "Technical\\Integration\\VendorNamespace\\ProjectNamespace\\": "tests/Technical/Integration",
+      "Functional\\VendorNamespace\\ProjectNamespace\\": "tests/Functional",
+      "Functional\\VendorNamespace\\ProjectNamespace\\BehatContext\\": "features/bootstrap"
+    }
+  }
+```
