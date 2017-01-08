@@ -74,10 +74,16 @@ It's not really useful for the developer, but it's better to always keep the sam
 
 <a name="rules-strict-mode"></a>
 ### Strict mode
+<a name="rules-strict-mode-exit-code"></a>
+#### Exit status
+**Tests execution must failed if contains one failed or on error test**
+
+<a name="rules-strict-mode-fails-id"></a>
+#### Fails if
 Following test must be converted into failed test : 
-<a name="rules-strict-mode-php-errors"></a>
+<a name="rules-strict-mode-fail-id-php-errors"></a>
  * A **test that have php notices/warnings/errors**
-<a name="rules-strict-mode-risky-tests"></a>
+<a name="rules-strict-mode-fail-id-risky-tests"></a>
  * A **[Risky test](#rules-risky-tests)**
 
 <a name="rules-risky-tests"></a>
@@ -100,7 +106,7 @@ Following behavior must turn test into Risky test
 A test must not impact another (and so a test must not expect that another has been executed)
 <a name="rules-tests-isolation-globals"></a>
  * **Globals must be backuped and restored between each test**
-<a name="rules-tests-isolation-static"></a>
+<a name="rules-tests-isolation-static-class-member"></a>
  * **Static class member must be backuped and restored between each test**
 <a name="rules-tests-isolation-different-process"></a>
  * *Test should be launched in different process*
