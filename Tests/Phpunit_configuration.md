@@ -1,6 +1,6 @@
 # PhpUnit configuration
 
-*PhpUnit implementation of this* **[Tests strategy](../Tests.md)**
+*PhpUnit implementation of this* **[Tests strategy](../TESTS_STRATEGY.md)**
 
 ## Configuration reference
 ```xml
@@ -53,44 +53,44 @@
 ### Rules validated with [configuration reference](#configuration-reference)
 #### Mandatory
 
-  * [Early stop](../Tests.md#rules-early-stop)
+  * [Early stop](../TESTS_STRATEGY.md#rules-early-stop)
 
     * `stopOnError="true"`
     * `stopOnFailure="true"`
 
-  * [Strict mode](../Tests.md#rules-strict-mode)
+  * [Strict mode](../TESTS_STRATEGY.md#rules-strict-mode)
 
-    * [Exit status](../Tests.md#exit-status) : PhpUnit command will return a failed status if a failed or on error test exist
-    * [Fails if](../Tests.md#rules-strict-mode-fails-if)
-      * [Php errors](../Tests.md#rules-strict-mode-fails-if-php-errors)
+    * [Exit status](../TESTS_STRATEGY.md#exit-status) : PhpUnit command will return a failed status if a failed or on error test exist
+    * [Fails if](../TESTS_STRATEGY.md#rules-strict-mode-fails-if)
+      * [Php errors](../TESTS_STRATEGY.md#rules-strict-mode-fails-if-php-errors)
 
         * `convertErrorsToExceptions="true"`
         * `convertNoticesToExceptions="true"`
         * `convertWarningsToExceptions="true"`
     
-      * [Risky tests](../Tests.md#rules-strict-mode-fails-if-risky-tests) (requires [`listener`](#listener))
+      * [Risky tests](../TESTS_STRATEGY.md#rules-strict-mode-fails-if-risky-tests) (requires [`listener`](#listener))
 
         * `beStrictAboutOutputDuringTests="true"`
         * `beStrictAboutChangesToGlobalState="true"`
         * `beStrictAboutTestsThatDoNotTestAnything="true"`
 
-  * [Risky test](../Tests.md#rules-risky-tests)
+  * [Risky test](../TESTS_STRATEGY.md#rules-risky-tests)
 
-    * [No Output](../Tests.md#rules-risky-tests-output) with `beStrictAboutOutputDuringTests="true"` 
-    * [No globals manipulation](../Tests.md#rules-risky-tests-manipulate-globals) with `beStrictAboutChangesToGlobalState="true"`
-    * [No test that test nothing](../Tests.md#rules-risky-tests-test-nothing) with `beStrictAboutTestsThatDoNotTestAnything="true"`
+    * [No Output](../TESTS_STRATEGY.md#rules-risky-tests-output) with `beStrictAboutOutputDuringTests="true"` 
+    * [No globals manipulation](../TESTS_STRATEGY.md#rules-risky-tests-manipulate-globals) with `beStrictAboutChangesToGlobalState="true"`
+    * [No test that test nothing](../TESTS_STRATEGY.md#rules-risky-tests-test-nothing) with `beStrictAboutTestsThatDoNotTestAnything="true"`
   
-  * [Test isolation](../Tests.md#rules-tests-isolation)
+  * [Test isolation](../TESTS_STRATEGY.md#rules-tests-isolation)
     
-    * [Globals backup](../Tests.md#rules-tests-isolation-globals) with `backupGlobals="true"`
+    * [Globals backup](../TESTS_STRATEGY.md#rules-tests-isolation-globals) with `backupGlobals="true"`
       
       *Required by `beStrictAboutChangesToGlobalState="true"`*
 
-    * [Static class member backup](../Tests.md#rules-tests-isolation-static-class-member) with `backupStaticAttributes="false"`
+    * [Static class member backup](../TESTS_STRATEGY.md#rules-tests-isolation-static-class-member) with `backupStaticAttributes="false"`
   
-  * [Real coverage](../Tests.md#rules-real-coverage)
+  * [Real coverage](../TESTS_STRATEGY.md#rules-real-coverage)
     
-    * [No coverage overflow](../Tests.md#rules-real-coverage-overflow)
+    * [No coverage overflow](../TESTS_STRATEGY.md#rules-real-coverage-overflow)
       
       * `forceCoversAnnotation="true"`
 
@@ -104,38 +104,38 @@
          */
         ```
 
-    * [Risky tests does not count in coverage](../Tests.md#rules-real-coverage-risky-tests)
+    * [Risky tests does not count in coverage](../TESTS_STRATEGY.md#rules-real-coverage-risky-tests)
     
-      * [No Output](../Tests.md#rules-risky-tests-output) with `beStrictAboutOutputDuringTests="true"` (requires [`listener`](#listener))
-      * [No globals manipulation](../Tests.md#rules-risky-tests-manipulate-globals) with `beStrictAboutChangesToGlobalState="true"`
-      * [No test that test nothing](../Tests.md#rules-risky-tests-test-nothing) with `beStrictAboutTestsThatDoNotTestAnything="true"`
+      * [No Output](../TESTS_STRATEGY.md#rules-risky-tests-output) with `beStrictAboutOutputDuringTests="true"` (requires [`listener`](#listener))
+      * [No globals manipulation](../TESTS_STRATEGY.md#rules-risky-tests-manipulate-globals) with `beStrictAboutChangesToGlobalState="true"`
+      * [No test that test nothing](../TESTS_STRATEGY.md#rules-risky-tests-test-nothing) with `beStrictAboutTestsThatDoNotTestAnything="true"`
     
   * <a name="listener"></a>\<listener>
       
     Listener will validate following mandatory rules
 
-    * [Strict mode - fails if - risky tests](../Tests.md#rules-strict-mode-fails-if-risky-tests)
+    * [Strict mode - fails if - risky tests](../TESTS_STRATEGY.md#rules-strict-mode-fails-if-risky-tests)
 
       * Required by 
       
-        * `beStrictAboutOutputDuringTests="true"` ([No Output](../Tests.md#rules-risky-tests-output))
-        * `beStrictAboutChangesToGlobalState="true"` ([No globals manipulation](../Tests.md#rules-risky-tests-manipulate-globals))
-        * `beStrictAboutTestsThatDoNotTestAnything="true"` ([No test that test nothing](../Tests.md#rules-risky-tests-test-nothing))
+        * `beStrictAboutOutputDuringTests="true"` ([No Output](../TESTS_STRATEGY.md#rules-risky-tests-output))
+        * `beStrictAboutChangesToGlobalState="true"` ([No globals manipulation](../TESTS_STRATEGY.md#rules-risky-tests-manipulate-globals))
+        * `beStrictAboutTestsThatDoNotTestAnything="true"` ([No test that test nothing](../TESTS_STRATEGY.md#rules-risky-tests-test-nothing))
 
-    * [Real coverage - risky tests  does not count in coverage](../Tests.md#rules-real-coverage-risky-tests) for some specific kinds of risky test   
+    * [Real coverage - risky tests  does not count in coverage](../TESTS_STRATEGY.md#rules-real-coverage-risky-tests) for some specific kinds of risky test   
       
-          * Required by `beStrictAboutOutputDuringTests="true"` ([No Output](../Tests.md#rules-risky-tests-output))
+          * Required by `beStrictAboutOutputDuringTests="true"` ([No Output](../TESTS_STRATEGY.md#rules-risky-tests-output))
   * <a name="test-suites"></a>\<test-suites>
     
-    * [Tests Root directory](../Tests.md#tests-root-directory)
-    * [Tests order](../Tests.md#tests-order)
+    * [Tests Root directory](../TESTS_STRATEGY.md#tests-root-directory)
+    * [Tests order](../TESTS_STRATEGY.md#tests-order)
 
 #### Optional
-  * [Test doc - tested class](../Tests.md#rules-test-documentation-tested-class-description) : by using `@covers`
+  * [Test doc - tested class](../TESTS_STRATEGY.md#rules-test-documentation-tested-class-description) : by using `@covers`
       
     *In fact, required if coverage is used as configuration uses `forceCoversAnnotation="true"`*
 
-  * [Test doc - tested class dependencies](../Tests.md#rules-test-documentation-tested-class-dependencies-description) by using `@uses`
+  * [Test doc - tested class dependencies](../TESTS_STRATEGY.md#rules-test-documentation-tested-class-dependencies-description) by using `@uses`
   
     Also use `checkForUnintentionallyCoveredCode="true"`, to be sure sure that new dependencies will be forced to be documented. With [configuration reference](#configuration-reference), it will convert test into risky test, and risky test will be converted into failed test by [`listener`](#listener)
       
@@ -152,4 +152,4 @@ class MyClassTest extends \PHPUnit_Framework_TestCase
   
   * `bootstrap="vendor/autoload.php"` : Autoload file
   * `colors="true"` : Pretty output
-  * `processIsolation="true"` : For [test isolation - different process](../Tests.md#rules-tests-isolation-different-process), but it could create edge cases
+  * `processIsolation="true"` : For [test isolation - different process](../TESTS_STRATEGY.md#rules-tests-isolation-different-process), but it could create edge cases
