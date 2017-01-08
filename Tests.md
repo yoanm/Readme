@@ -78,7 +78,7 @@ It's not really useful for the developer, but it's better to always keep the sam
 #### Exit status
 **Tests execution must failed if contains one failed or on error test**
 
-<a name="rules-strict-mode-fails-id"></a>
+<a name="rules-strict-mode-fails-if"></a>
 #### Fails if
 Following test must be converted into failed test : 
 <a name="rules-strict-mode-fail-id-php-errors"></a>
