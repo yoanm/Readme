@@ -65,7 +65,10 @@ Test could use a slice of repository source code (to ensure a functionality for 
 Tests will use the complete repository source code and will perform tests to cover production end-user actions
 
 ## Rules 
+
 *See [Phpunit config example](example-phpunit-configuration-example)*
+
+<a name="rules-early-stop"></a>
 ### Early stop
 **Tests execution must be stop at first failure or error**
 
@@ -163,8 +166,9 @@ A test must not impact another (and so a test must not expect that another has b
      4 - With **Behat** : Slower than previous ones
 
 ### Base namespace
+
 *See [Composer config example](example-composer-configuration-example)*
-<a name="rules-early-stop"></a>
+
 #### Technical tests
  * **Unit level** : `Technical\Unit\VendorNamespace\ProjectNamespace`
  * **Integration level** : `Technical\Integration\VendorNamespace\ProjectNamespace`
