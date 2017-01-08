@@ -16,8 +16,8 @@
    * [Tests order](#tests-order)
    * [Base namespace](#base-namespace)
  * [Example](#example)
-   * [PhpUnit configuration example](#phpunit-configuration-example)
-   * [Composer configuration example](#composer-configuration-example)
+   * [PhpUnit implementation](#example-phpunit-implementation)
+   * [Composer implementation](#example-composer-implementation)
 
 ## Explanation
 <a name="technical-tests-explanation"></a>
@@ -203,12 +203,12 @@ A Behat context must have the following namespace and path:
  * Path `features/bootstrap/MyContext.php`
  * Namespace `Functional\VendorNamespace\ProjectNamespace\BehatContext`
  
-<a name="example-phpunit-configuration-example"></a>
-### PhpUnit configuration example
+<a name="example-phpunit-implementation"></a>
+### PhpUnit implementation
 See [there](./TestStrategy/PHPUNIT_IMPLEMENTATION.md)
 
-<a name="example-composer-configuration-example"></a>
-### Composer configuration example
+<a name="example-composer-implementation"></a>
+### Composer implementation
 ```json
   "autoload-dev": {
     "psr-4": {
