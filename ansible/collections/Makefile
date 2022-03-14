@@ -1,75 +1,155 @@
 # Based on that awesome makefile https://github.com/dunglas/symfony-docker/blob/main/docs/makefile.md#the-template
 
-# Let user override python binary, collection's namespace/name/version if needed
+# Let user override python binary if needed
 PYTHON?=python
+# Ability to enable coverage where it doable
+WITH_COVERAGE?=0
+# Enable docker for ansible tests
+WITH_DOCKER?=0
+# Python target for ansible tests
+WITH_PY_TARGET?=
+# Coverage report type (default to console report)
+WITH_COVERAGE_REPORT?=console
 
-COLLECTION_NAMESPACE?=$(shell $(PYTHON) -c 'import yaml;print(yaml.load(open("galaxy.yml"), yaml.SafeLoader)["namespace"])')
-COLLECTION_NAME?=$(shell $(PYTHON) -c 'import yaml;print(yaml.load(open("galaxy.yml"), yaml.SafeLoader)["name"])')
-COLLECTION_VERSION?=$(shell $(PYTHON) -c 'import yaml;print(yaml.load(open("galaxy.yml"), yaml.SafeLoader)["version"])')
+COLLECTION_NAMESPACE=$(shell $(PYTHON) -c 'import yaml;print(yaml.load(open("galaxy.yml"), yaml.SafeLoader)["namespace"])')
+COLLECTION_NAME=$(shell $(PYTHON) -c 'import yaml;print(yaml.load(open("galaxy.yml"), yaml.SafeLoader)["name"])')
+COLLECTION_VERSION=$(shell $(PYTHON) -c 'import yaml;print(yaml.load(open("galaxy.yml"), yaml.SafeLoader)["version"])')
 
-BUILD_DIR=build
+ANSIBLE_VERSION=$(shell $(PYTHON) -c 'from ansible import __version__ ;print("%s" % ".".join( __version__.split(".")[:2]));')
+# ansible-core below v2.11 doesn't support installing fom current directory if it is not under C_NAMESPACE/C_NAME directories
+# Install from tar.gz instead
+ifeq ($(ANSIBLE_VERSION), 2.9)
+ANSIBLE_INSTALL_OLD_FASHION=1
+else ifeq ($(ANSIBLE_VERSION), 2.10)
+ANSIBLE_INSTALL_OLD_FASHION=1
+else
+ANSIBLE_INSTALL_OLD_FASHION=0
+endif
+
+BUILD_DIR?=build
 ANSIBLE_COLLECTIONS_BUILD_DIR=${BUILD_DIR}/ansible_collections
 COLLECTION_BUILD_DIR=${ANSIBLE_COLLECTIONS_BUILD_DIR}/${COLLECTION_NAMESPACE}/${COLLECTION_NAME}
 
+ifeq ($(WITH_COVERAGE),1)
+ANSIBLE_COVERAGE_OPTION=--coverage
+else
+ANSIBLE_COVERAGE_OPTION=
+endif
+ifeq ($(WITH_DOCKER),1)
+ANSIBLE_DOCKER_OPTION=--docker
+else
+ANSIBLE_DOCKER_OPTION=
+endif
+ifneq ($(WITH_PY_TARGET),)
+ANSIBLE_PY_TARGET_OPTION=--python $(WITH_PY_TARGET)
+else
+ANSIBLE_PY_TARGET_OPTION=
+endif
+
 .DEFAULT_GOAL = default
 
-default: clean configure-dev
+.PHONY: default
+default: clean configure-dev-env
 
-## —— 📚 Help ——————————————————————————————————————————————————————————————
+##—— 📚 Help ——————————————————————————————————————————————————————————————
 .PHONY: help
 help: ## ❓ Dislay this help
-	@grep -E '(^[a-zA-Z0-9_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
+	@grep -E '(^[a-zA-Z0-9_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) \
+		| awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' \
+		| sed -e 's/\[32m##——————————/[33m           /'  \
+		| sed -e 's/\[32m##——/[33m ——/' \
+		| sed -e 's/\[32m####/[34m                                 /' \
+		| sed -e 's/\[32m###/[36m                                 /' \
+		| sed -e 's/\[32m##\?/[35m /'  \
+		| sed -e 's/\[32m##/[33m/'
 
-## —— ️⚙️  Environments ——————————————————————————————————————————————————————
+##—— ️⚙️  Environments ——————————————————————————————————————————————————————
 .PHONY: clean
 clean: ## 🧹 Clean generated contents
 clean:
-	rm -rf ${BUILD_DIR}/* tests/output .mypy_cache ${COLLECTION_NAMESPACE}-${COLLECTION_NAME}-*.tar.gz
+	rm -rf build/* tests/output .mypy_cache ${COLLECTION_NAMESPACE}-${COLLECTION_NAME}-*.tar.gz
 
-.PHONY: configure-dev
-configure-dev: ## 🤖 Install collection's required libraries to current python environment
-configure-dev:
-	$(PYTHON) -m pip install -r tests/requirements.txt # Install tests requirements
-	$(PYTHON) -m pip install -r meta/ee-requirements.txt # Install internal requirements
+.PHONY: configure-dev-env
+configure-dev-env: ## 🤖 Install required libraries for dev environment (python libs used on codebase)
+configure-dev-env:
+	$(PYTHON) -m pip install --upgrade --upgrade-strategy eager -r meta/ee-requirements.txt # Install internal requirements
 
-.PHONY: configure-test-ansible
-configure-test-ansible: ## 🧪️ Deploy to the temporary build directory for test usage
-configure-test-ansible:
-	rm -rf ${COLLECTION_BUILD_DIR} # Remove only this collection directory (dependencies will be kept there if previously installed)
-	$(MAKE) install-local path="${ANSIBLE_COLLECTIONS_BUILD_DIR}"
-	cd ${COLLECTION_BUILD_DIR} && git init . # Workaround when test folder is under a gitignored folder (else ansible-test does nothing)
+.PHONY: configure-test-env
+configure-test-env: ## 🤖 Install required libraries for test environment (libs used on codebase, MyPy, etc)
+#### Use target="..." to restrict extra galaxy requirements installation to specific target (units, integration, sanity)
+$(eval target ?=)
+configure-test-env: configure-dev-env
+	$(PYTHON) -m pip install --upgrade --upgrade-strategy eager -r tests/requirements.txt # Install tests requirements
+ifeq ($(shell if ([ "$(target)" = "units" ] || [ "$(target)" = "" ]) && [ -f tests/unit/requirements.yml ]; then echo 1; else echo 0; fi),1)
+	$(MAKE) install install_o="-p ${ANSIBLE_COLLECTIONS_BUILD_DIR} -r tests/unit/requirements.yml" upgrade=1 source="--"
+endif
+ifeq ($(shell if ([ "$(target)" = "sanity" ] || [ "$(target)" = "" ]) && [ -f tests/sanity/requirements.yml ]; then echo 1; else echo 0; fi),1)
+	$(MAKE) install install_o="-p ${ANSIBLE_COLLECTIONS_BUILD_DIR} -r tests/sanity/requirements.yml" upgrade=1 source="--"
+endif
+ifeq ($(shell if ([ "$(target)" = "integration" ] || [ "$(target)" = "" ]) && [ -f tests/integration/requirements.yml ]; then echo 1; else echo 0; fi),1)
+	$(MAKE) install install_o="-p ${ANSIBLE_COLLECTIONS_BUILD_DIR} -r tests/integration/requirements.yml" upgrade=1 source="--"
+endif
 
-## —— 🇦 Ansible collection —————————————————————————————————————————————————
-##               \_ 🛰️  Galaxy ——————————————————————————————————————————————
+##—— 🇦 Ansible collection —————————————————————————————————————————————————
+##—————————— \_ 🛰️  Galaxy —————————————————————————————————————————————————
 .PHONY: build
 build: ## 🗜️  Build for galaxy deployment (creates a tar.gz file)
+#### Use build_o="..." to specify build options (--force, --output-path PATH, --token TOKEN, etc)
+$(eval build_o ?=)
 build: clean
-	@$(eval o ?=)
-	ansible-galaxy collection build $(o) .
+	ansible-galaxy collection build $(build_o) .
 
 .PHONY: install
-install: ## ✍️  Install to default ansible collections directory (to use the collection inside a playbook for instance)
+install: ## ✍️  Install to a directory (to use the collection inside a playbook for instance)
+#### Use install_o="..." to specify install options (--force, -p PATH, --no-deps, etc)
+$(eval install_o ?=)
+#### Use upgrade=1 instead of install_o="--upgrade" to keep compatibility with ansible below 2.10
+$(eval upgrade ?= 0)
+#### Use source="..." to specify the source (tar.gz path mostly, default to current directory)
+$(eval source ?= .)
+ifeq ($(source),.)
+# Clean project in case goal is to install current project
 install: clean
-	@$(eval o ?=)
-	ansible-galaxy collection install --force $(o) .
+endif
+install:
+ifeq ($(shell if [ "$(ANSIBLE_INSTALL_OLD_FASHION)" = "1" ] && [ "$(upgrade)" = "1" ]; then echo 1; else echo 0; fi),1)
+	@echo "###################################################################################################"
+	@echo "# Found --upgrade, not compatible with old fashion install. Existing content will be kept as is ! #"
+	@echo "###################################################################################################"
+else ifeq ($(upgrade),1)
+	UPGRADE_OPT=" --upgrade"
+endif
+ifeq ($(shell if [ "$(ANSIBLE_INSTALL_OLD_FASHION)" = "1" ] && [ "$(source)" = "." ]; then echo 1; else echo 0; fi),1)
+	@echo "#########################################"
+	@echo "# Old fashion installation using tar.gz #"
+	@echo "#########################################"
+	$(MAKE) build build_o="--output-path ${BUILD_DIR} --force"
+	ansible-galaxy collection install $(install_o) ${BUILD_DIR}/${COLLECTION_NAMESPACE}-${COLLECTION_NAME}-${COLLECTION_VERSION}.tar.gz
+else
+	ansible-galaxy collection install $(install_o)$$UPGRADE_OPT $(source)
+endif
 
 .PHONY: deploy
 deploy: ## 🚀 Deploy to ansible galaxy
 	@echo "TODO"
-##               \_ 📁 Local ———————————————————————————————————————————————
-.PHONY: install-local
-install-local: ## ✍️  Install for dev or tests usage. Example `make install-local path="path/to/somewhere" o="--no-deps --force"`
-install-local:
-	@$(eval o ?=)
-	ansible-galaxy collection install -p $(path) $(o) --force .
-##               \_ 🐍 Python ——————————————————————————————————————————————
+##—————————— \_ 🧪️ Tests ——————————————————————————————————————————————————
+.PHONY: build-for-test
+build-for-test: ## 🧪️ Build to the temporary build directory for test usage
+#### Use install_o="..." to specify install options (--force, -p PATH, --no-deps, etc)
+$(eval install_o ?=)
+build-for-test:
+	rm -rf ${COLLECTION_BUILD_DIR} # Remove only the collection directory (dependencies will be kept there if previously installed)
+	$(MAKE) install install_o="$(install_o) --force -p ${ANSIBLE_COLLECTIONS_BUILD_DIR}" upgrade=1 # Use upgrade=1 to always run on latest versions
+	cd ${COLLECTION_BUILD_DIR} && git init -q . # Workaround when test folder is under a gitignored folder (else ansible-test does nothing)
+
+##—————————— \_ 🐍 Python —————————————————————————————————————————————————
 .PHONY: install-as-python-pkg
 install-as-python-pkg: ## 🔗 Build the collection and mount content as python package to current python environment
-install-as-python-pkg: build_dir=${BUILD_DIR}/python-pkg
-install-as-python-pkg: pkg_name=local-${COLLECTION_NAMESPACE}-${COLLECTION_NAME}-ansible-collections
+$(eval build_dir = /tmp/python-pkg/${COLLECTION_NAMESPACE}-${COLLECTION_NAME})
+$(eval pkg_name = local-${COLLECTION_NAMESPACE}-${COLLECTION_NAME}-ansible-collections)
 install-as-python-pkg: clean
 	rm -rf $(build_dir)/*
-	$(MAKE) install-local path="$(build_dir)/$(pkg_name)" o="--no-deps"
+	$(MAKE) install install_o="--no-deps --force -p $(build_dir)/$(pkg_name)"
 	cd $(build_dir) && $(PYTHON) -c 'from setuptools import setup;setup(name="$(pkg_name)", version="${COLLECTION_VERSION}", package_dir={"": "$(pkg_name)"}, packages=["ansible_collections"])' develop
 
 .PHONY: uninstall-python-pkg
@@ -79,12 +159,12 @@ uninstall-python-pkg:
 	$(MAKE) clean
 
 
-## —— 🧪️ Tests —————————————————————————————————————————————————————————————
+##—— 🧪️ Tests —————————————————————————————————————————————————————————————
 .PHONY: test
 test: ## 🏃 Launch all tests
 test: test-python test-ansible
 
-##               \_ 🐍 Python ——————————————————————————————————————————————
+##—————————— \_ 🐍 Python —————————————————————————————————————————————————
 .PHONY: test-python
 test-python: ## 🏃 Launch python-related tests (typehint, lint, etc)
 test-python: test-mypy
@@ -93,23 +173,82 @@ test-python: test-mypy
 test-mypy: ## 🏃 Launch MyPy checks
 test-mypy:
 	$(PYTHON) -m mypy --config-file mypy.ini .
+	$(PYTHON) -m mypy --config-file tests/mypy.ini tests
 
-##               \_ 🇦 Ansible tests ————————————————————————————————————————
+##—————————— \_ 🇦 Ansible tests ———————————————————————————————————————————
+### Trigger ansible-related tests upon built collection
 .PHONY: test-ansible
 test-ansible: ## 🏃 Launch ansible-related tests (unit, integration and sanity tests)
-test-ansible: configure-test-ansible test-ansible-sanity
+### Unit and integration tests will be triggered only if related test directory exist!
+test-ansible: build-for-test
+test-ansible:
+ifneq ($(wildcard tests/unit),) # Execute tests only if there is the required directory !
+	$(MAKE) test-ansible-units
+else
+	@echo '################################################################'
+	@echo '# Unit test deactivated as "tests/unit" directory is missing ! #'
+	@echo '################################################################'
+endif
+	$(MAKE) test-ansible-sanity
+ifneq ($(wildcard tests/integration/targets),) # Execute tests only if there is the required directory !
+	$(MAKE) test-ansible-integration
+else
+	@echo '#######################################################################################'
+	@echo '# Integration tests deactivated as "tests/integration/targets" directory is missing ! #'
+	@echo '#######################################################################################'
+endif
 
-.PHONY: test-ansible-unit
-test-ansible-unit: ## 🏃 Launch ansible unit tests
-	@echo "TODO"
+.PHONY: test-ansible-units
+test-ansible-units: ## 🏃 Launch ansible unit tests
+#### Use units_o="..." to specify options (--color, --docker, --coverage, etc)
+$(eval units_o ?= -v --color --requirements $(ANSIBLE_COVERAGE_OPTION) $(ANSIBLE_DOCKER_OPTION) $(ANSIBLE_PY_TARGET_OPTION))
+test-ansible-units:
+	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	@echo "~                       ~~ Ansible unit tests ~~                                ~"
+	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	cd ${COLLECTION_BUILD_DIR} && ansible-test units $(units_o)
 
 .PHONY: test-ansible-integration
+	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	@echo "~                    ~~ Ansible integration tests ~~                            ~"
+	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 test-ansible-integration: ## 🏃 Launch ansible integration tests
-	@echo "TODO"
+#### Use integration_o="..." to specify options (--retry-on-error, --python VERSION, --docker, --coverage, etc)
+$(eval integration_o ?= -v --color --requirements --diff --retry-on-error --continue-on-error $(ANSIBLE_COVERAGE_OPTION) $(ANSIBLE_DOCKER_OPTION) $(ANSIBLE_PY_TARGET_OPTION))
+test-ansible-integration:
+	cd ${COLLECTION_BUILD_DIR} && ansible-test integration $(integration_o)
 
 .PHONY: test-ansible-sanity
-test-ansible-sanity: ## 🏃 Launch ansible sanity checks. To target a specific test, execute `make test-ansible-sanity c="--test TEST_NAME"`
+test-ansible-sanity: ## 🏃 Launch ansible sanity checks.
+#### Use sanity_o="..." to specify options (--test TEST_NAME, --docker, --coverage, etc)
+$(eval sanity_o ?= -v --color --requirements $(ANSIBLE_COVERAGE_OPTION) $(ANSIBLE_DOCKER_OPTION) $(ANSIBLE_PY_TARGET_OPTION))
 test-ansible-sanity:
-	@$(eval c ?=)
-	cd ${COLLECTION_BUILD_DIR} && ansible-test sanity $(c)
+	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	@echo "~                      ~~ Ansible sanity tests ~~                               ~"
+	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	cd ${COLLECTION_BUILD_DIR} && ansible-test sanity $(sanity_o)
+
+.PHONY: test-ansible-coverage
+test-ansible-coverage: ## 🏃 Launch ansible coverage generation ("report" by default, for console report)
+#### Use coverage_o="..." to specify options (--requirements, --group-by GROUP, etc)
+$(eval coverage_o ?= -v --color --requirements)
+#### Use coverage_c="..." to specify coverage command (report, html, combine, etc)
+ifeq ($(WITH_COVERAGE_REPORT),console)
+$(eval coverage_c ?= report)
+test-ansible-coverage: coverage_c?=report
+else
+$(eval coverage_c ?= $(WITH_COVERAGE_REPORT))
+test-ansible-coverage: coverage_c?=$(WITH_COVERAGE_REPORT)
+endif
+test-ansible-coverage:
+	cd ${COLLECTION_BUILD_DIR} && ansible-test coverage $(coverage_c) $(coverage_o);
+
+##—— 🔧 Options ——————————————————————————————————————————————————————————————
+##? Python binary:    Use `PYTHON=... make TARGET` to override Python binary used (default to "python")
+##? Build directory:  Use `BUILD_DIR=... make TARGET` to override build directory (default to "build" directory inside project
+##  🇦 Ansible
+##? Docker:           Use `WITH_DOCKER=1 make TARGET` to enable docker for ansible tests
+##? Python target:    Use `WITH_PY_TARGET=X.Y make TARGET` to target a specific python version during ansible tests
+##? Coverage:         Use `WITH_COVERAGE=1 make TARGET` to enable coverage where it's doable
+##? Coverage report:  Use `WITH_COVERAGE_REPORT=... make TARGET` to define report type (xml, console or report, html)
 
