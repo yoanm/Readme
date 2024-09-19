@@ -1,17 +1,17 @@
 ## ●➤ Role
-👉 Technical, mostly back-end
+👉 Technical, mostly back-end. Something around DevXP would be nice
 
-👉 Usual day largely involving code (analysis, conception, implementation, tests, deployment)
+👉 Usual day largely involving code _analysis, conception, implementation, tests, deployment_
 
 ✋ No managerial role
 
 
 ## ●➤ Languages
-👉 PHP, I would be happy to still be able to use my beloved language
+👉 **PHP** ❤️
 
-👉 A bit of JS/TS won’t scare me though
+👉 A bit of **JS**/**TS** won’t scare me though
 
-👉 A pinch of Go, Rust or Python (even occasionally) would be nice and motivating
+👉 A pinch of **Go**, **Python** or **Rust** (even occasionally) would be motivating
 
 
 ## ●➤ Technical environment
@@ -21,10 +21,13 @@
 ### 🧑‍💻 Dev & CI
 👉 One may argue that it’s rather basic, but: design patterns, unit & functional tests, Static analysis, Coverage, Quality gate
 
-### 🚀 Delivery
-👉 Well-established deployment process, including automated E2E tests
+### 🚀 Delivery*
+
+👉 Well-established deployment process, automated E2E tests
 
 👉 A deployment bot would be nice (even nicer if the job involves working on it)
+
+_* When appropriate_
 
 ### 🔎 Monitoring
 👉 ELK, grafana, prometheus or alike
